@@ -2,7 +2,8 @@ package com.unifacisa.coursestorm.Controllers.Course;
 
 import com.unifacisa.coursestorm.Models.Category.Category;
 import com.unifacisa.coursestorm.Models.Course.Course;
-import com.unifacisa.coursestorm.Services.Category.CategoryService;
+import com.unifacisa.coursestorm.Models.Course.DTO.CourseCreateDTO;
+import com.unifacisa.coursestorm.Repositories.Category.CategoryRepository;
 import com.unifacisa.coursestorm.Services.Course.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,73 +20,73 @@ public class CourseController {
     private CourseService courseService;
 
     @Autowired
-    private CategoryService categoryService;
+    private CategoryRepository categoryRepository;
 
-    // Listar todos os cursos
+    @PostMapping
+    public ResponseEntity<Course> createCourse(@RequestBody CourseCreateDTO courseCreateDTO) {
+        Category category = categoryRepository.findById(courseCreateDTO.getCategoryId()).orElse(null);
+        if (category == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Course course = new Course();
+        course.setName(courseCreateDTO.getName());
+        course.setVideoUrl(courseCreateDTO.getVideoUrl());
+        course.setPdfUrl(courseCreateDTO.getPdfUrl());
+        course.setCategory(category);
+
+        Course createdCourse = courseService.save(course);
+        return ResponseEntity.created(null).body(createdCourse);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Course> updateCourse(@PathVariable Long id, @RequestBody CourseCreateDTO courseCreateDTO) {
+        // Verifica se o curso existe
+        Optional<Course> optionalCourse = courseService.findById(id);
+        if (optionalCourse.isEmpty()) {
+            return ResponseEntity.notFound().build(); // Retorna erro se o curso não é encontrado
+        }
+
+        Course existingCourse = optionalCourse.get();
+
+        // Busca a categoria associada ao curso
+        Category category = categoryRepository.findById(courseCreateDTO.getCategoryId()).orElse(null);
+        if (category == null) {
+            return ResponseEntity.badRequest().build(); // Retorna erro se a categoria não existe
+        }
+
+        // Atualiza os dados do curso existente
+        existingCourse.setName(courseCreateDTO.getName());
+        existingCourse.setVideoUrl(courseCreateDTO.getVideoUrl());
+        existingCourse.setPdfUrl(courseCreateDTO.getPdfUrl());
+        existingCourse.setCategory(category);
+
+        // Salva e retorna o curso atualizado
+        Course updatedCourse = courseService.save(existingCourse);
+        return ResponseEntity.ok(updatedCourse);
+    }
+
+
+
     @GetMapping
     public List<Course> getAllCourses() {
-        return courseService.getAllCourses();
+        return courseService.findAll();
     }
 
-    // Criar um novo curso associado a uma categoria
-    @PostMapping
-    public ResponseEntity<Course> createCourse(@RequestBody Course course) {
-        // Valida se a categoria fornecida existe
-        if (course.getCategory() != null && course.getCategory().getId() != null) {
-            Optional<Category> category = categoryService.getCategoryById(course.getCategory().getId());
-            if (category.isPresent()) {
-                course.setCategory(category.get());
-            } else {
-                return ResponseEntity.badRequest().body(null);
-            }
-        }
-        Course createdCourse = courseService.saveCourse(course);
-        return ResponseEntity.ok(createdCourse);
-    }
-
-    // Buscar um curso por ID
     @GetMapping("/{id}")
     public ResponseEntity<Course> getCourseById(@PathVariable Long id) {
-        Optional<Course> course = courseService.getCourseById(id);
-        return course.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        return courseService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    // Atualizar um curso e sua categoria associada
-    @PutMapping("/{id}")
-    public ResponseEntity<Course> updateCourse(@PathVariable Long id, @RequestBody Course courseDetails) {
-        Optional<Course> courseOptional = courseService.getCourseById(id);
-        if (courseOptional.isPresent()) {
-            Course course = courseOptional.get();
-            course.setName(courseDetails.getName());
-            course.setVideoUrl(courseDetails.getVideoUrl());
-            course.setPdfUrl(courseDetails.getPdfUrl());
-
-            // Verifica e atualiza a categoria associada, se fornecida
-            if (courseDetails.getCategory() != null && courseDetails.getCategory().getId() != null) {
-                Optional<Category> category = categoryService.getCategoryById(courseDetails.getCategory().getId());
-                if (category.isPresent()) {
-                    course.setCategory(category.get());
-                } else {
-                    return ResponseEntity.badRequest().body(null);
-                }
-            }
-
-            Course updatedCourse = courseService.saveCourse(course);
-            return ResponseEntity.ok(updatedCourse);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    // Deletar um curso
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCourse(@PathVariable Long id) {
-        if (courseService.getCourseById(id).isPresent()) {
-            courseService.deleteCourse(id);
-            return ResponseEntity.noContent().build();
-        } else {
+        if (!courseService.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
+        courseService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
+

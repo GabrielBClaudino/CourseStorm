@@ -1,62 +1,65 @@
 package com.unifacisa.coursestorm.Controllers.Category;
 
 import com.unifacisa.coursestorm.Models.Category.Category;
+import com.unifacisa.coursestorm.Models.Category.DTO.CategoryCreateDTO;
 import com.unifacisa.coursestorm.Services.Category.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/categories")
 public class CategoryController {
+
     @Autowired
     private CategoryService categoryService;
 
-    // Listar todas as categorias
     @GetMapping
     public List<Category> getAllCategories() {
-        return categoryService.getAllCategory();
+        return categoryService.findAll();
     }
 
-    // Criar uma nova categoria
-    @PostMapping
-    public Category createCategory(@RequestBody Category category) {
-        return categoryService.saveCategory(category);
-    }
-
-    // Buscar uma categoria por ID
     @GetMapping("/{id}")
     public ResponseEntity<Category> getCategoryById(@PathVariable Long id) {
-        Optional<Category> categoria = categoryService.getCategoryById(id);
-        return categoria.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        Category category = categoryService.findById(id);
+        return category != null ? ResponseEntity.ok(category) : ResponseEntity.notFound().build();
     }
 
-    // Atualizar uma categoria
-    @PutMapping("/{id}")
-    public ResponseEntity<Category> updateCategory(@PathVariable Long id, @RequestBody Category categoryDetails) {
-        Optional<Category> categoryOptional = categoryService.getCategoryById(id);
-        if (categoryOptional.isPresent()) {
-            Category category = categoryOptional.get();
-            categoryDetails.setName(categoryDetails.getName());
-            Category updatedCategory = categoryService.saveCategory(category);
-            return ResponseEntity.ok(updatedCategory);
-        } else {
-            return ResponseEntity.notFound().build();
+    @PostMapping
+    public ResponseEntity<Category> createCategory(@RequestBody CategoryCreateDTO categoryDTO) {
+        Category category = new Category();
+        category.setName(categoryDTO.getName());
+        // Se o parentId estiver presente, você pode buscar a categoria pai e definir
+        if (categoryDTO.getParentId() != null) {
+            Category parent = categoryService.findById(categoryDTO.getParentId());
+            category.setParent(parent);
         }
+        Category createdCategory = categoryService.save(category);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
     }
 
-    // Deletar uma categoria
+    @PostMapping("/{parentId}/children")
+    public ResponseEntity<Category> addChildCategory(@PathVariable Long parentId, @RequestBody CategoryCreateDTO childDTO) {
+        Category child = new Category();
+        child.setName(childDTO.getName());
+        categoryService.addChild(parentId, child);
+        return ResponseEntity.created(null).body(child);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Category> updateCategory(@PathVariable Long id, @RequestBody CategoryCreateDTO categoryDTO) {
+        return categoryService.findById(id) != null ?
+                ResponseEntity.ok(categoryService.save(new Category(categoryDTO.getName(), null))) : ResponseEntity.notFound().build();
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
-        if (categoryService.getCategoryById(id).isPresent()) {
-            categoryService.deleteCategory(id);
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        categoryService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
+
+

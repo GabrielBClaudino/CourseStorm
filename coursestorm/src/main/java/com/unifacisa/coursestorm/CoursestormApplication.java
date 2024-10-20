@@ -32,6 +32,12 @@ public class CoursestormApplication implements CommandLineRunner {
 			superAdmin.setPassword(passwordEncoder.encode("superadmin123"));
 			superAdmin.setRole(UserRole.valueOf("SUPERADMIN"));
 
+			/*
+			{
+ 			 "email": "superadmin@admin.com",
+  			 "password": "superadmin123"
+			 }
+			*/
 			// Salva o usuário no repositório
 			userRepository.save(superAdmin);
 

@@ -6,30 +6,33 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-
 @Service
 public class CategoryService {
+
     @Autowired
     private CategoryRepository categoryRepository;
 
-    // Método para listar todos as Categorias
-    public List<Category> getAllCategory() {
+    public List<Category> findAll() {
         return categoryRepository.findAll();
     }
 
-    // Método para criar ou atualizar uma Categoria
-    public Category saveCategory(Category category) {
+    public Category findById(Long id) {
+        return categoryRepository.findById(id).orElse(null);
+    }
+
+    public Category save(Category category) {
         return categoryRepository.save(category);
     }
 
-    // Método para buscar uma Categoria pelo ID
-    public Optional<Category> getCategoryById(Long id) {
-        return categoryRepository.findById(id);
+    public void delete(Long id) {
+        categoryRepository.deleteById(id);
     }
 
-    // Método para deletar uma Categoria pelo ID
-    public void deleteCategory(Long id) {
-        categoryRepository.deleteById(id);
+    public void addChild(Long parentId, Category child) {
+        Category parent = findById(parentId);
+        if (parent != null) {
+            parent.addChild(child);
+            save(parent); // Atualiza a categoria pai
+        }
     }
 }
