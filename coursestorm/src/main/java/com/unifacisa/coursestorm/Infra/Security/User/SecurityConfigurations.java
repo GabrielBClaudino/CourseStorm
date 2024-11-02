@@ -27,16 +27,16 @@ public class SecurityConfigurations {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST,"/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/login").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html", "/v3/api-docs.yaml").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/auth/register").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST,"/register").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST,"/courses").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET,"/courses").hasRole("ADMIN")
                         .requestMatchers("/categories/**").permitAll()
 
 
-                        .requestMatchers("/auth/users").hasRole("ADMIN")
-                        .requestMatchers("/auth/users/**").hasRole("ADMIN")
+                        .requestMatchers("/users").hasRole("ADMIN")
+                        .requestMatchers("/users/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

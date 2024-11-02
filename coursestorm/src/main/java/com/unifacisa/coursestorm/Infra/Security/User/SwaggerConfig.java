@@ -25,7 +25,7 @@ public class SwaggerConfig {
         return new OpenAPI()
                 .info(new Info().title("CourseStorm API")
                         .description("API para Gerenciamento de Cursos")
-                        .version("v1.0"))
+                        .version("v3.0"))
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
                 .components(new Components().addSecuritySchemes("bearerAuth", securityScheme));
     }
