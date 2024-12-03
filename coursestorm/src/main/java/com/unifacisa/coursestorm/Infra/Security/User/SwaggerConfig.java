@@ -24,7 +24,7 @@ public class SwaggerConfig {
         // Adiciona o esquema de segurança ao Swagger e define um título/descrição da API
         return new OpenAPI()
                 .info(new Info().title("CourseStorm API")
-                        .description("API para Gerenciamento de Cursos")
+                        .description("API para Autenticação de Usuarios e Gerenciamento de Cursos com Categorias")
                         .version("v3.0"))
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
                 .components(new Components().addSecuritySchemes("bearerAuth", securityScheme));

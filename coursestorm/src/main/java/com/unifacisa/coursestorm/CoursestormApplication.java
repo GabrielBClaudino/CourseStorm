@@ -25,7 +25,7 @@ public class CoursestormApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		// Verifica se já existe um usuário SuperAdmin pelo email
-		if (!userRepository.existsByEmail("superadmin@admin.com")) { // Alteração para existsByEmail
+		if (!userRepository.existsByEmail("superadmin@admin.com")) {
 			// Cria um SuperAdmin padrão
 			User superAdmin = new User();
 			superAdmin.setEmail("superadmin@admin.com");
@@ -38,7 +38,7 @@ public class CoursestormApplication implements CommandLineRunner {
   			 "password": "superadmin123"
 			 }
 			*/
-			// Salva o usuário no repositório
+
 			userRepository.save(superAdmin);
 
 			System.out.println("Usuário SuperAdmin criado com sucesso!");

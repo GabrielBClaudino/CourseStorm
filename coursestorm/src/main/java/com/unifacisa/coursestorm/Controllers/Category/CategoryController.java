@@ -84,29 +84,6 @@ public class CategoryController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
     }
 
-    @Operation(
-            summary = "Adiciona uma Subcategoria a uma Categoria Pai",
-            description = "Cria uma nova subcategoria associada a uma categoria pai especificada pelo ID.",
-            parameters = {
-                    @Parameter(name = "parentId", description = "ID da categoria pai à qual a subcategoria será associada", required = true, in = ParameterIn.PATH, schema = @Schema(type = "integer", format = "int64")),
-                    @Parameter(name = "childDTO", description = "Dados da subcategoria a ser criada", required = true, schema = @Schema(implementation = CategoryCreateDTO.class))
-            },
-            method = "POST"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Subcategoria criada com sucesso!"),
-            @ApiResponse(responseCode = "422", description = "Dados de requisição inválidos!"),
-            @ApiResponse(responseCode = "400", description = "Parâmetros inválidos!"),
-            @ApiResponse(responseCode = "500", description = "Erro ao realizar a operação!"),
-            @ApiResponse(responseCode = "401", description = "Usuário não autorizado!")
-    })
-    @PostMapping("/{parentId}/children")
-    public ResponseEntity<Category> addChildCategory(@PathVariable Long parentId, @RequestBody CategoryCreateDTO childDTO) {
-        Category child = new Category();
-        child.setName(childDTO.getName());
-        categoryService.addChild(parentId, child);
-        return ResponseEntity.created(null).body(child);
-    }
 
     @Operation(
             summary = "Atualiza uma Categoria existente",

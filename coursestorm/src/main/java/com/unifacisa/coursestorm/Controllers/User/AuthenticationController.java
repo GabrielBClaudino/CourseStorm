@@ -95,7 +95,7 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "500", description = "Erro ao realizar a operação.")
     })
     @GetMapping("/users/{id}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable String id) {
+    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
         Optional<UserDTO> user = userService.getUserById(id);
         return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -112,7 +112,7 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "500", description = "Erro ao realizar a operação.")
     })
     @PutMapping("/users/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable String id, @RequestBody UserUpdateDTO userUpdateDTO) {
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserUpdateDTO userUpdateDTO) {
         Optional<UserDTO> updatedUser = userService.updateUser(id, userUpdateDTO);
         return updatedUser.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -128,7 +128,7 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "500", description = "Erro ao realizar a operação.")
     })
     @DeleteMapping("/users/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         if (userService.getUserById(id).isPresent()) {
             userService.deleteUserById(id);
             return ResponseEntity.noContent().build();

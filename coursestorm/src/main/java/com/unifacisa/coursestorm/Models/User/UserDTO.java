@@ -1,6 +1,5 @@
 package com.unifacisa.coursestorm.Models.User;
 
-import com.unifacisa.coursestorm.Models.User.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO {
-    private String id;
+    private Long id;
     private String email;
     private String registrationNumber;
     private String firstName;

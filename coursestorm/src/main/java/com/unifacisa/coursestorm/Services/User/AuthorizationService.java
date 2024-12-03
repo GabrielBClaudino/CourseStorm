@@ -39,7 +39,7 @@ public class AuthorizationService implements UserDetailsService {
     }
 
     // Método para buscar um usuário por ID e retornar como DTO
-    public Optional<UserDTO> getUserById(String id) {
+    public Optional<UserDTO> getUserById(Long id) {
         return userRepository.findById(id).map(this::convertToUserDTO);
     }
 
@@ -58,7 +58,7 @@ public class AuthorizationService implements UserDetailsService {
     }
 
     // Método para atualizar um usuário existente a partir do UserUpdateDTO
-    public Optional<UserDTO> updateUser(String id, UserUpdateDTO userUpdateDTO) {
+    public Optional<UserDTO> updateUser(Long id, UserUpdateDTO userUpdateDTO) {
         Optional<User> existingUser = userRepository.findById(id);
         if (existingUser.isPresent()) {
             User user = existingUser.get();
@@ -73,7 +73,7 @@ public class AuthorizationService implements UserDetailsService {
     }
 
     // Método para deletar um usuário por ID
-    public void deleteUserById(String id) {
+    public void deleteUserById(Long id) {
         userRepository.deleteById(id);
     }
 
